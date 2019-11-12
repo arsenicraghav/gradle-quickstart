@@ -1,0 +1,54 @@
+plugins {
+    id "application"
+}
+apply plugin :"java"
+
+description = "Gradle setup for main method"
+group = "com.raghav"
+version = "1.0.0"
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+ext {
+   javaMainClass = "com.raghav.gradle.MainClass"
+}
+
+jar {
+    manifest {
+        attributes(
+            "Main-Class": javaMainClass
+        )
+    }
+}
+
+application {
+    mainClassName = javaMainClass
+}
+
+task runWithJavaExec(type: JavaExec) {
+    group = "Execution"
+    description = "Run the main class"
+    classpath = sourceSets.main.runtimeClasspath
+    main = javaMainClass
+}
+
+task runWithExec(type: Exec) {
+    dependsOn build
+    group = "Execution"
+    description = "Run the main class"
+    commandLine "java", "-classpath", sourceSets.main.runtimeClasspath.getAsPath(), javaMainClass
+}
+
+task runWithExecJarExecutable(type: Exec) {
+    dependsOn jar
+    group = "Execution"
+    description = "Run from executable jar"
+    commandLine "java", "-jar", jar.archiveFile.get()
+}
+
+task runWithExecJarOnClassPath(type: Exec) {
+    dependsOn jar
+    group = "Execution"
+    description = "Run from output jar in classpath"
+    commandLine "java", "-classpath", jar.archiveFile.get() , javaMainClass
+}
